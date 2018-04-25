@@ -23,11 +23,8 @@ Rules of life:
 
 GRID_SIZE = 80
 
-LIVE = True
-DEAD = False
-
-NEIGHBOUR_ADJUSTMENTS = (-1, 1)
-
+LIVE = 1
+DEAD = 0
 
 def create_grid():
     return [
@@ -35,47 +32,37 @@ def create_grid():
         for _ in range(GRID_SIZE)
     ]
 
-
 def display_line(line):
     print(
         ''.join(("X" if cell is LIVE else " " for cell in line))
     )
 
-
 def display_grid(grid):
     for line in grid:
         display_line(line)
 
+def count_neighb_plus_self(grid,x,y):
+    count = 0
+    for xdif in [-1,0,1]:
+        xn = x + xdif
+        for ydif in [-1,0,1]:            
+            yn = y + ydif
+            if xn in range(GRID_SIZE) and yn in range(GRID_SIZE):
+                count = count + grid[xn][yn]                
+    return count
 
-def apply_adjustments(coord):
-    return filter(lambda x: 0 <= x < GRID_SIZE, [coord + adjustment for adjustment in NEIGHBOUR_ADJUSTMENTS])
-
+def live_or_dead(cell_state,count):
+    if count == 3:
+        return 1
+    elif count < 3 or count > 4:
+        return 0     
+    elif count == 4:
+        return 0 if cell_state == 0 else 1
 
 def update_grid(grid):
-    new_grid = list()
+    return [[live_or_dead(grid[x][y], count_neighb_plus_self(grid,x,y)) for y in range(GRID_SIZE)] for x in range(GRID_SIZE)]
 
-    for x, line in enumerate(grid):
-        new_grid.append(list())
-
-        for y, cell in enumerate(line):
-            list_of_neighbours = [
-                grid[_x][_y]
-                for _y in apply_adjustments(y)
-                for _x in apply_adjustments(x)
-            ]
-            num_of_neighbours = sum(map(int, list_of_neighbours))
-
-            if num_of_neighbours == 3:
-                new_cell = LIVE
-            elif cell is LIVE and num_of_neighbours == 2:
-                new_cell = LIVE
-            else:
-                new_cell = DEAD
-
-            new_grid[x].append(new_cell)
-    return new_grid
-
-
+#grid = testgrid
 grid = create_grid()
 
 while True:
