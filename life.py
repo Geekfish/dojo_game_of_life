@@ -41,28 +41,30 @@ def display_grid(grid):
     for line in grid:
         display_line(line)
 
-def count_neighb_plus_self(grid,x,y):
+def in_grid(x, y):
+    return 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE
+
+def count_neighb_plus_self(grid, x, y):
     count = 0
-    for xdif in [-1,0,1]:
+    for xdif in [-1, 0, 1]:
         xn = x + xdif
-        for ydif in [-1,0,1]:            
+        for ydif in [-1, 0, 1]:
             yn = y + ydif
-            if xn in range(GRID_SIZE) and yn in range(GRID_SIZE):
-                count = count + grid[xn][yn]                
+            if in_grid(xn, yn):
+                count += grid[xn][yn]
     return count
 
 def live_or_dead(cell_state,count):
     if count == 3:
-        return 1
+        return LIVE
     elif count < 3 or count > 4:
-        return 0     
+        return DEAD
     elif count == 4:
-        return 0 if cell_state == 0 else 1
+        return DEAD if cell_state == DEAD else LIVE
 
 def update_grid(grid):
-    return [[live_or_dead(grid[x][y], count_neighb_plus_self(grid,x,y)) for y in range(GRID_SIZE)] for x in range(GRID_SIZE)]
+    return [[live_or_dead(grid[x][y], count_neighb_plus_self(grid, x, y)) for y in range(GRID_SIZE)] for x in range(GRID_SIZE)]
 
-#grid = testgrid
 grid = create_grid()
 
 while True:
@@ -70,3 +72,4 @@ while True:
     grid = update_grid(grid)
     display_grid(grid)
     sleep(1)
+ 
